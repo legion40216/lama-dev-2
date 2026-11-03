@@ -1,6 +1,5 @@
-import React from 'react'
-import NavDesktop from './nav-middle/nav-desktop';
-import Logo from './logo';
+import Logo from "./logo";
+import NavDesktop from "./nav-middle/nav-desktop";
 
 export default function NavMiddle() {
   return (
@@ -13,5 +12,5 @@ export default function NavMiddle() {
         <NavDesktop />
       </div>
     </div>
-  )
+  );
 }

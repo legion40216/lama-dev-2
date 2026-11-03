@@ -1,5 +1,5 @@
-import { buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
 
 const NotFound = () => {
   return (
@@ -10,10 +10,7 @@ const NotFound = () => {
       <p className="text-lg text-gray-600 mb-6">
         Oops! The page you are looking for does not exist.
       </p>
-      <Link 
-        href="/" 
-        className={buttonVariants({ variant: "outline" })}
-      >
+      <Link href="/" className={buttonVariants({ variant: "outline" })}>
         Click here
       </Link>
     </div>

@@ -1,15 +1,15 @@
 import { cookies } from "next/headers";
-import { products } from "@/data/data";
+
+import HeadingState from "@/components/global-ui/heading-state";
 import { getPriceBounds } from "@/data/constants";
-import { CategorySlug, FilterValue, SizeFilter } from "@/schema";
+import { products } from "@/data/data";
+import type { CategorySlug, FilterValue, SizeFilter } from "@/schema";
+import { clampPriceRange } from "@/utils/clamp-price-range";
 import { filterProducts } from "@/utils/filter-products";
 import { sortProducts } from "@/utils/sort-products";
-import { clampPriceRange } from "@/utils/clamp-price-range";
-
-import ProductList from "./product-list";
-import HeadingState from "@/components/global-ui/heading-state";
 import FilterSidebar from "./components/filter-sidebar";
 import { GRID_COLUMNS_COOKIE, parseGridColumns } from "./grid-columns";
+import ProductList from "./product-list";
 
 export default async function ProductSection({
   categoryParam,
@@ -17,11 +17,11 @@ export default async function ProductSection({
   sizeParam,
   minPrice,
   maxPrice,
-  brandParam,
   featuredParam,
   inStockParam,
   showCategoryFilter = true,
   headingTitle = "Collections",
+  headingSubtitle = "Find something you'll wear on repeat.",
   queryParam = "",
 }: {
   categoryParam: CategorySlug;
@@ -29,11 +29,11 @@ export default async function ProductSection({
   sizeParam: SizeFilter;
   minPrice: number;
   maxPrice: number;
-  brandParam: string[];
   featuredParam: boolean;
   inStockParam: boolean;
   showCategoryFilter?: boolean;
   headingTitle?: string;
+  headingSubtitle?: string;
   queryParam?: string;
 }) {
   // Read on the server so the first paint already uses the saved layout.
@@ -42,14 +42,17 @@ export default async function ProductSection({
     cookieStore.get(GRID_COLUMNS_COOKIE)?.value,
   );
 
-  const priceBounds = getPriceBounds({ category: categoryParam, size: sizeParam });
+  const priceBounds = getPriceBounds({
+    category: categoryParam,
+    size: sizeParam,
+  });
   const priceRange = clampPriceRange({ minPrice, maxPrice }, priceBounds);
 
   const filterProps = {
     categoryParam,
+    sizeParam,
     minPrice: priceRange.minPrice,
     maxPrice: priceRange.maxPrice,
-    brandParam,
     featuredParam,
     inStockParam,
     showCategoryFilter,
@@ -57,7 +60,7 @@ export default async function ProductSection({
   };
 
   const filteredAndSorted = sortProducts(
-    filterProducts(products, { ...filterProps, sizeParam, queryParam }),
+    filterProducts(products, { ...filterProps, queryParam }),
     filterParam,
     sizeParam,
   );
@@ -68,8 +71,8 @@ export default async function ProductSection({
         title={queryParam ? "Search" : headingTitle}
         subtitle={
           queryParam
-            ? "Fragrances matching your search."
-            : "Discover your next signature scent."
+            ? `Results for \u201c${queryParam}\u201d.`
+            : headingSubtitle
         }
       />
 

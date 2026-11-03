@@ -1,35 +1,44 @@
-import React from 'react'
+import Image from "next/image";
+import Link from "next/link";
 
-import Image from 'next/image'
-import MainSection from '../sections/main-section'
-import Link from 'next/link'
-import { CategorySlug } from '@/schema'
-
-import { Button } from '@/components/ui/button'
+import CategoriesBar from "@/components/global-ui/categories-bar";
+import { buttonVariants } from "@/components/ui/button";
+import type { CategorySlug } from "@/schema";
+import MainSection from "../sections/main-section";
 
 export default function HomepageView({
-  categoryParam
+  categoryParam,
 }: {
-  categoryParam: CategorySlug
+  categoryParam: CategorySlug;
 }) {
+  const allProductsHref =
+    categoryParam === "all"
+      ? "/products"
+      : `/products?category=${categoryParam}`;
+
   return (
     <div className="space-y-4">
-      <div className="relative aspect-[3/1]">
-        <Image src="/assets/featured.png" alt="Garment Store Home" fill />
+      <div className="relative aspect-[3/1] overflow-hidden">
+        <Image
+          src="/assets/featured.png"
+          alt="Garment Store featured collection"
+          fill
+          priority
+          sizes="(min-width: 1200px) 1200px, 100vw"
+          className="object-cover"
+        />
       </div>
 
-      <MainSection categoryParam={categoryParam}/>
+      <CategoriesBar categoryParam={categoryParam} />
+      <MainSection categoryParam={categoryParam} />
 
-      <div className='flex justify-end'>
-        <Button 
-          variant={"link"} 
-          asChild 
-          className="text-muted-foreground"
+      <div className="flex justify-end">
+        <Link
+          href={allProductsHref}
+          className={buttonVariants({ variant: "link" })}
         >
-          <Link href={categoryParam === 'all' ? `/products` : `/products/?category=${categoryParam}`}>
-           See All Products
-          </Link>
-        </Button>
+          See all products
+        </Link>
       </div>
     </div>
   );

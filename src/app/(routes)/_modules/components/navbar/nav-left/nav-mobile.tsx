@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { Menu } from "lucide-react";
+import { useState } from "react";
 
 import NavLinks from "@/components/global-ui/nav-links";
 import { Button } from "@/components/ui/button";
@@ -25,20 +25,22 @@ export default function NavMobile() {
   return (
     <div className="md:hidden">
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetTrigger>
+        <SheetTrigger
+          render={<Button variant="ghost" size="icon" aria-label="Open menu" />}
+        >
           <Menu className="size-5" />
         </SheetTrigger>
 
         <SheetContent side="left" className="overflow-y-auto p-4">
-          <SheetTitle className="sr-only">Fragrance Navigation</SheetTitle>
+          <SheetTitle className="sr-only">Garment Store navigation</SheetTitle>
           <SheetDescription className="sr-only">
-            Navigation menu for Fragrance
+            Navigation menu for Garment Store
           </SheetDescription>
 
           <div className="flex h-full flex-col justify-between">
             <div className="grid gap-6">
               <div>
-                <h2 className="text-xl font-bold">Fragrance</h2>
+                <h2 className="text-xl font-bold">Garment Store</h2>
               </div>
 
               <nav className="flex flex-col gap-2">

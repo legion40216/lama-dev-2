@@ -2,23 +2,22 @@
 
 import { useEffect, useState } from "react";
 
-import { categories, brands } from "@/data/data";
-import { PRICE_STEP } from "@/data/constants";
-import { useUpdateSearchParams } from "@/hooks/use-update-search-params";
-import type { CategorySlug } from "@/schema";
-import { formatter } from "@/utils/formatters";
-
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
-import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Slider } from "@/components/ui/slider";
+import { categories } from "@/data/categories";
+import { availableSizes, PRICE_STEP } from "@/data/constants";
+import { useUpdateSearchParams } from "@/hooks/use-update-search-params";
+import type { CategorySlug, SizeFilter } from "@/schema";
+import { formatter } from "@/utils/formatters";
 
 export interface FilterControlsProps {
   categoryParam: CategorySlug;
+  sizeParam: SizeFilter;
   minPrice: number;
   maxPrice: number;
-  brandParam: string[];
   featuredParam: boolean;
   inStockParam: boolean;
   showCategoryFilter?: boolean;
@@ -26,17 +25,38 @@ export interface FilterControlsProps {
   priceBounds: { min: number; max: number };
 }
 
-export default function FilterControls({
+export function countActiveFilters({
   categoryParam,
+  sizeParam,
   minPrice,
   maxPrice,
-  brandParam,
   featuredParam,
   inStockParam,
   showCategoryFilter = true,
-  onChange,
   priceBounds,
-}: FilterControlsProps) {
+}: Omit<FilterControlsProps, "onChange">): number {
+  return (
+    (showCategoryFilter && categoryParam !== "all" ? 1 : 0) +
+    (sizeParam ? 1 : 0) +
+    (minPrice !== priceBounds.min || maxPrice !== priceBounds.max ? 1 : 0) +
+    (inStockParam ? 1 : 0) +
+    (featuredParam ? 1 : 0)
+  );
+}
+
+export default function FilterControls(props: FilterControlsProps) {
+  const {
+    categoryParam,
+    sizeParam,
+    minPrice,
+    maxPrice,
+    featuredParam,
+    inStockParam,
+    showCategoryFilter = true,
+    onChange,
+    priceBounds,
+  } = props;
+
   const { update, clear, isPending } = useUpdateSearchParams();
 
   const [priceDraft, setPriceDraft] = useState<[number, number]>([
@@ -53,10 +73,6 @@ export default function FilterControls({
     onChange?.();
   };
 
-  const handleCategoryChange = (slug: string) => {
-    updateParams({ category: slug === "all" ? null : slug });
-  };
-
   const handlePriceCommit = (value: number | readonly number[]) => {
     if (typeof value === "number") return;
 
@@ -67,64 +83,36 @@ export default function FilterControls({
     });
   };
 
-  const handleBrandToggle = (brand: string) => {
-    const next = brandParam.includes(brand)
-      ? brandParam.filter((b) => b !== brand)
-      : [...brandParam, brand];
-
-    updateParams({ brand: next.length ? next.join(",") : null });
-  };
-
-  const handleInStockToggle = (checked: boolean) => {
-    updateParams({ inStock: checked ? "true" : null });
-  };
-
-  const handleFeaturedToggle = (checked: boolean) => {
-    updateParams({ featured: checked ? "true" : null });
-  };
-
   const handleClearAll = () => {
     clear();
     onChange?.();
   };
-
-  const hasActiveFilters =
-    (showCategoryFilter && !!categoryParam) ||
-    minPrice !== priceBounds.min ||
-    maxPrice !== priceBounds.max ||
-    brandParam.length > 0 ||
-    inStockParam ||
-    featuredParam;
 
   return (
     <div
       className="space-y-6 transition-opacity aria-busy:opacity-60"
       aria-busy={isPending}
     >
-      <div>
-        <h2 className="font-medium">Filters</h2>
-      </div>
+      <h2 className="font-medium">Filters</h2>
 
       {showCategoryFilter && (
         <div className="space-y-3">
           <Label className="text-sm font-medium">Category</Label>
           <RadioGroup
-            value={categoryParam ?? "all"}
-            onValueChange={handleCategoryChange}
+            value={categoryParam}
+            onValueChange={(slug) =>
+              updateParams({ category: slug === "all" ? null : String(slug) })
+            }
           >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="all" id="cat-all" />
-              <Label htmlFor="cat-all" className="font-normal cursor-pointer">
-                All
-              </Label>
-            </div>
-
             {categories.map((category) => (
-              <div key={category.id} className="flex items-center space-x-2">
-                <RadioGroupItem value={category.slug} id={`cat-${category.id}`} />
+              <div key={category.slug} className="flex items-center space-x-2">
+                <RadioGroupItem
+                  value={category.slug}
+                  id={`cat-${category.slug}`}
+                />
                 <Label
-                  htmlFor={`cat-${category.id}`}
-                  className="font-normal cursor-pointer"
+                  htmlFor={`cat-${category.slug}`}
+                  className="cursor-pointer font-normal"
                 >
                   {category.name}
                 </Label>
@@ -133,6 +121,29 @@ export default function FilterControls({
           </RadioGroup>
         </div>
       )}
+
+      <div className="space-y-3">
+        <Label className="text-sm font-medium">Size</Label>
+        <div className="flex flex-wrap gap-2">
+          {availableSizes.map((size) => {
+            const isActive = sizeParam === size;
+
+            return (
+              <Button
+                key={size}
+                type="button"
+                size="sm"
+                variant={isActive ? "default" : "outline"}
+                aria-pressed={isActive}
+                onClick={() => updateParams({ size: isActive ? null : size })}
+                className="min-w-9"
+              >
+                {size}
+              </Button>
+            );
+          })}
+        </div>
+      </div>
 
       <div className="space-y-3">
         <Label className="text-sm font-medium">Price</Label>
@@ -151,34 +162,15 @@ export default function FilterControls({
         </div>
       </div>
 
-      <div className="space-y-3">
-        <Label className="text-sm font-medium">Brand</Label>
-        <div className="space-y-2">
-          {brands.map((brand) => (
-            <div key={brand} className="flex items-center space-x-3">
-              <Checkbox
-                id={`brand-${brand}`}
-                checked={brandParam.includes(brand)}
-                onCheckedChange={() => handleBrandToggle(brand)}
-              />
-              <Label
-                htmlFor={`brand-${brand}`}
-                className="font-normal cursor-pointer"
-              >
-                {brand}
-              </Label>
-            </div>
-          ))}
-        </div>
-      </div>
-
       <div className="flex items-center space-x-3">
         <Checkbox
           id="in-stock"
           checked={inStockParam}
-          onCheckedChange={(checked) => handleInStockToggle(!!checked)}
+          onCheckedChange={(checked) =>
+            updateParams({ inStock: checked ? "true" : null })
+          }
         />
-        <Label htmlFor="in-stock" className="font-normal cursor-pointer">
+        <Label htmlFor="in-stock" className="cursor-pointer font-normal">
           In stock only
         </Label>
       </div>
@@ -187,15 +179,17 @@ export default function FilterControls({
         <Checkbox
           id="featured"
           checked={featuredParam}
-          onCheckedChange={(checked) => handleFeaturedToggle(!!checked)}
+          onCheckedChange={(checked) =>
+            updateParams({ featured: checked ? "true" : null })
+          }
         />
-        <Label htmlFor="featured" className="font-normal cursor-pointer">
-          Featured & Best Sellers
+        <Label htmlFor="featured" className="cursor-pointer font-normal">
+          Featured only
         </Label>
       </div>
 
       <div className="flex justify-end">
-        {hasActiveFilters && (
+        {countActiveFilters(props) > 0 && (
           <Button variant="ghost" size="sm" onClick={handleClearAll}>
             Clear all
           </Button>

@@ -1,12 +1,12 @@
 "use client";
 
-import type { FilterValue } from "@/schema";
-import { sortOptions } from "@/data/constants";
-import { useUpdateSearchParams } from "@/hooks/use-update-search-params";
 import {
   NativeSelect,
   NativeSelectOption,
 } from "@/components/ui/native-select";
+import { sortOptions } from "@/data/constants";
+import { useUpdateSearchParams } from "@/hooks/use-update-search-params";
+import type { FilterValue } from "@/schema";
 
 export default function ProductListFilter({
   currentFilter,
