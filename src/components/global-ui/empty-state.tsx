@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import type React from "react";
 
 export default function EmptyState({
   title = "",
@@ -16,9 +16,7 @@ export default function EmptyState({
         <p className="text-2xl font-bold">{title}</p>
         <p className="font-light text-neutral-500">{subtitle}</p>
       </div>
-      <div>
-        {children}
-      </div>
+      <div>{children}</div>
     </div>
   );
 }

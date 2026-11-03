@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Garment Store
 
-## Getting Started
-
-First, run the development server:
+Next.js 16 (App Router, Cache Components) + Tailwind v4 + shadcn/ui (Base UI) + zustand.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
+npm run lint     # biome
+npx tsc --noEmit
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Routes
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Route | Status |
+| --- | --- |
+| `/` | done – hero, category tabs, first 8 products |
+| `/products` | done – filters (category, size, price, in stock, featured), sort, search `?q=` |
+| `/categories` | done – category tabs + the same listing |
+| `/products/[slug]` | **todo** – product cards already link here (`getProductBySlug` is ready) |
+| `/checkout` | **todo** – the cart and quick view already link here |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+State lives in the URL (`?category=hoodies&size=M&minPrice=20`) and is validated in `src/schema`.
+Anything invalid falls back to a default, so a hand-edited URL never breaks the page.
 
-## Learn More
+## Product data (`src/data/data.ts`)
 
-To learn more about Next.js, take a look at the following resources:
+```ts
+{
+  id: "5",
+  slug: "classic-fleece-hoodie",          // unique, used in the URL
+  name, description,
+  category: "hoodies",                    // must be a slug from src/data/categories.ts
+  colors: [                               // defined once; first colour = card image
+    { name: "Black", code: "#2b2f33", image: "/assets/products/5bl.png" },
+  ],
+  sizes: [
+    {
+      size: "M",                          // must exist in src/data/sizes.ts
+      price: 39.99,
+      discount: 4,                        // amount off (not %), omit for none
+      stock: { Black: 18, Orange: 10 },   // keys must be colour names
+    },                                    //   0 = sold out, key missing = not made in this size
+  ],
+  isNew, isFeatured, isArchived,          // archived products are hidden everywhere
+  createdAt: "2024-06-10T14:20:00Z",
+}
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Adding a category:** add it to `src/data/categories.ts` (pick a lucide icon). The tabs, sidebar
+filter and URL validation all follow.
+**Adding a size** (e.g. `"XXL"` or `"One Size"`): add it to `src/data/sizes.ts` first.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Prices are plain dollars (`19.99`). Convert to integer cents when you wire up payments.

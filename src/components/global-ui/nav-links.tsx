@@ -1,8 +1,8 @@
 "use client";
 
-import React, { ReactNode } from "react";
 import Link from "next/link";
-import { cn } from "cn";
+import type { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 interface NavLinksProps {
   routeActive?: boolean;
@@ -36,7 +36,7 @@ export default function NavLinks({
       className={cn(
         "transition-colors",
         routeActive ? activeClassName : inactiveClassName,
-        className
+        className,
       )}
     >
       {children ?? routeLabel}
