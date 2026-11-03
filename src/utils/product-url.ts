@@ -1,21 +1,18 @@
-import type { ProductSize, ProductType } from "@/types/types";
-import { getDefaultVariant } from "@/utils/product-variants";
+import type { ProductSize } from "@/types/types";
 
-// "/products/noir-essence" or "/products/noir-essence?size=100ml"
-export function getProductPath(slug: string, size?: ProductSize): string {
-  return size ? `/products/${slug}?size=${size}` : `/products/${slug}`;
+// "/products/classic-fleece-hoodie" or "...?size=M&color=Orange"
+export function getProductPath(
+  slug: string,
+  selection?: { size?: ProductSize; color?: string },
+): string {
+  const params = new URLSearchParams();
+  if (selection?.size) params.set("size", selection.size);
+  if (selection?.color) params.set("color", selection.color);
+
+  const query = params.toString();
+  return query ? `/products/${slug}?${query}` : `/products/${slug}`;
 }
 
-// Turns the ?size= value from the URL into the size to preselect.
-// A valid size stays selected even when it is sold out.
-// Unknown sizes fall back to the default available size.
-export function getInitialSize(
-  product: Pick<ProductType, "variants">,
-  sizeParam: string | string[] | undefined,
-): ProductSize {
-  const requested = Array.isArray(sizeParam) ? sizeParam[0] : sizeParam;
-
-  const match = product.variants.find((variant) => variant.size === requested);
-
-  return (match ?? getDefaultVariant(product)).size;
+export function firstParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
 }

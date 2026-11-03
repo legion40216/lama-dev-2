@@ -1,55 +1,46 @@
-// schema/index.ts
 import { z } from "zod";
-import { categories, brands } from "@/data/data";
-import type { ProductCategorySlug } from "@/data/categories";
-import { sortOptions, PRICE_BOUNDS, type SortValue } from "@/data/constants";
+import {
+  type CategorySlug as CategorySlugValue,
+  categories,
+} from "@/data/categories";
+import { PRICE_BOUNDS, type SortValue, sortOptions } from "@/data/constants";
+import { type ProductSize, SIZES } from "@/data/sizes";
 
-const validCategorySlugs = categories.map((category) => category.slug) as [
-  ProductCategorySlug,
-  ...ProductCategorySlug[],
+const categorySlugs = categories.map((category) => category.slug) as [
+  CategorySlugValue,
+  ...CategorySlugValue[],
 ];
 
-const validFilterValues = sortOptions.map((option) => option.value) as [
+const sortValues = sortOptions.map((option) => option.value) as [
   SortValue,
   ...SortValue[],
 ];
 
+// Every param falls back to a safe default instead of throwing, so a hand-edited
+// URL never breaks the page.
 const baseSearchParamsSchema = z.object({
-  q: z.string().trim().max(80).optional().catch(""),
-  category: z.enum(validCategorySlugs).optional().catch(undefined),
+  q: z.string().trim().max(80).catch(""),
 
-  filter: z
-    .enum(validFilterValues)
-    .optional()
-    .catch("newest")
-    .default("newest"),
+  // "all" means no category filter
+  category: z.enum(categorySlugs).catch("all"),
 
-  size: z.enum(["50ml", "100ml"]).optional().catch(undefined),
+  filter: z.enum(sortValues).catch("newest"),
+
+  size: z.enum(SIZES).optional().catch(undefined) as z.ZodType<
+    ProductSize | undefined
+  >,
 
   minPrice: z.coerce
     .number()
     .min(PRICE_BOUNDS.min)
     .max(PRICE_BOUNDS.max)
-    .optional()
-    .catch(PRICE_BOUNDS.min)
-    .default(PRICE_BOUNDS.min),
+    .catch(PRICE_BOUNDS.min),
 
   maxPrice: z.coerce
     .number()
     .min(PRICE_BOUNDS.min)
     .max(PRICE_BOUNDS.max)
-    .optional()
-    .catch(PRICE_BOUNDS.max)
-    .default(PRICE_BOUNDS.max),
-
-  // Comma-separated list of brand names -> string[], unknown brands dropped
-  brand: z
-    .string()
-    .optional()
-    .catch(undefined)
-    .transform((value) =>
-      value ? value.split(",").filter((b) => brands.includes(b)) : []
-    ),
+    .catch(PRICE_BOUNDS.max),
 
   inStock: z
     .enum(["true"])
@@ -64,11 +55,11 @@ const baseSearchParamsSchema = z.object({
     .transform((value) => value === "true"),
 });
 
-// ?minPrice=9000&maxPrice=1000 would match nothing, so swap an inverted range.
+// ?minPrice=90&maxPrice=10 would match nothing, so swap an inverted range.
 export const searchParamsSchema = baseSearchParamsSchema.transform((params) =>
   params.minPrice > params.maxPrice
     ? { ...params, minPrice: params.maxPrice, maxPrice: params.minPrice }
-    : params
+    : params,
 );
 
 export type SearchParamsValues = z.infer<typeof searchParamsSchema>;

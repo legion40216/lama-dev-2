@@ -1,151 +1,201 @@
-import type { ProductType } from "@/types/types";
+import type { ProductsType } from "@/types/types";
 
-export { categories } from "./categories";
-
-export const products: ProductsType = [
+const rawProducts: ProductsType = [
   {
-    id: 1,
-    name: "Classic White T-Shirt",
-    description: "A timeless white t-shirt made from 100% organic cotton.",
-    images: ["/assets/products/1g.png", "/assets/products/1gr.png", "/assets/products/1p.png"],
-    colors: [{
-      name: "Gray",
-      code: "#808080",
-    }, {
-      name: "Green",
-      code: "#22c55e",
-    }, {
-      name: "Purple",
-      code: "#a855f7",
-    }],
-    category: "T-Shirts",
+    id: "1",
+    slug: "oversized-cotton-tee",
+    name: "Oversized Cotton Tee",
+    description: "A relaxed, boxy t-shirt made from 100% organic cotton.",
+    category: "t-shirts",
+    colors: [
+      { name: "Gray", code: "#808080", image: "/assets/products/1g.png" },
+      { name: "Green", code: "#6b7f6b", image: "/assets/products/1gr.png" },
+      { name: "Purple", code: "#6b6a9a", image: "/assets/products/1p.png" },
+    ],
+    sizes: [
+      { size: "S", price: 19.99, stock: { Gray: 10, Green: 5 } },
+      {
+        size: "M",
+        price: 21.99,
+        discount: 2,
+        stock: { Gray: 15, Green: 8, Purple: 0 },
+      },
+      { size: "L", price: 23.99, stock: { Gray: 12, Purple: 3 } },
+      {
+        size: "XL",
+        price: 25.99,
+        discount: 3,
+        stock: { Gray: 8, Green: 4, Purple: 6 },
+      },
+    ],
     isNew: true,
     isFeatured: true,
     isArchived: false,
     createdAt: "2024-06-01T10:00:00Z",
-    sizes: [
-      {
-        size: "S",
-        price: 19.99,
-        discount: 0,
-        variants: [
-          { color: "Gray", colorCode: "#808080", image: "/assets/products/1g.png", stock: 10 },
-          { color: "Green", colorCode: "#22c55e", image: "/assets/products/1gr.png", stock: 5 },
-        ]
-      },
-      {
-        size: "M",
-        price: 21.99,
-        discount: 2, // $2 off for Medium
-        variants: [
-          { color: "Gray", colorCode: "#808080", image: "/assets/products/1g.png", stock: 15 },
-          { color: "Green", colorCode: "#22c55e", image: "/assets/products/1gr.png", stock: 8 },
-          { color: "Purple", colorCode: "#a855f7", image: "/assets/products/1p.png", stock: 0 },
-        ]
-      },
-      {
-        size: "L",
-        price: 23.99,
-        discount: 0,
-        variants: [
-          { color: "Gray", colorCode: "#808080", image: "/assets/products/1g.png", stock: 12 },
-          { color: "Purple", colorCode: "#a855f7", image: "/assets/products/1p.png", stock: 3 },
-        ]
-      },
-      {
-        size: "XL",
-        price: 25.99,
-        discount: 3, // $3 off for XL
-        variants: [
-          { color: "Gray", colorCode: "#808080", image: "/assets/products/1g.png", stock: 8 },
-          { color: "Green", colorCode: "#22c55e", image: "/assets/products/1gr.png", stock: 4 },
-          { color: "Purple", colorCode: "#a855f7", image: "/assets/products/1p.png", stock: 6 },
-        ]
-      },
-    ],
   },
   {
-    id: 2,
-    name: "Designer Coffee Mug",
-    description: "Beautiful ceramic mug perfect for your morning coffee or tea.",
-    imageSrc: "",
-    images: ["/assets/products/mug-blue.png", "/assets/products/mug-red.png", "/assets/products/mug-white.png"],
-    colors: [{
-      name: "Blue",
-      code: "#3b82f6",
-    }, {
-      name: "Red",
-      code: "#ef4444",
-    }, {
-      name: "White",
-      code: "#ffffff",
-    }],
-    category: "Accessories",
+    id: "2",
+    slug: "plaid-pullover-hoodie",
+    name: "Plaid Pullover Hoodie",
+    description: "Soft brushed-cotton hoodie with a classic plaid pattern.",
+    category: "hoodies",
+    colors: [
+      { name: "Gray", code: "#8a8d8a", image: "/assets/products/2g.png" },
+      { name: "Green", code: "#7d8f6d", image: "/assets/products/2gr.png" },
+    ],
+    sizes: [
+      { size: "S", price: 44.99, stock: { Gray: 6, Green: 4 } },
+      { size: "M", price: 44.99, stock: { Gray: 9, Green: 7 } },
+      { size: "L", price: 46.99, discount: 5, stock: { Gray: 5, Green: 0 } },
+      { size: "XL", price: 46.99, stock: { Gray: 3, Green: 2 } },
+    ],
     isNew: false,
     isFeatured: true,
     isArchived: false,
     createdAt: "2024-05-15T09:30:00Z",
-    // Standalone product - no size variations, just colors
-    sizes: [
-      {
-        size: "One Size",
-        price: 14.99,
-        discount: 3,
-        variants: [
-          { color: "Blue", colorCode: "#3b82f6", image: "/assets/products/mug-blue.png", stock: 20 },
-          { color: "Red", colorCode: "#ef4444", image: "/assets/products/mug-red.png", stock: 15 },
-          { color: "White", colorCode: "#ffffff", image: "/assets/products/mug-white.png", stock: 25 },
-        ]
-      }
-    ],
   },
   {
-    id: 3,
-    name: "Premium Cotton Polo",
-    description: "Elegant polo shirt with breathable fabric and modern fit.",
-    imageSrc: "",
-    images: ["/assets/products/polo-navy.png", "/assets/products/polo-white.png"],
-    colors: [{
-      name: "Navy",
-      code: "#1e3a8a",
-    }, {
-      name: "White",
-      code: "#ffffff",
-    }],
-    category: "T-Shirts",
+    id: "3",
+    slug: "colour-block-hoodie",
+    name: "Colour-Block Hoodie",
+    description: "Heavyweight fleece hoodie with a bold colour-block graphic.",
+    category: "hoodies",
+    colors: [
+      { name: "Blue", code: "#2f4a6b", image: "/assets/products/3b.png" },
+      { name: "Black", code: "#1f2326", image: "/assets/products/3bl.png" },
+      { name: "Green", code: "#1f5c45", image: "/assets/products/3gr.png" },
+    ],
+    sizes: [
+      { size: "S", price: 54.99, stock: { Blue: 5, Black: 8, Green: 0 } },
+      { size: "M", price: 54.99, stock: { Blue: 10, Black: 12, Green: 6 } },
+      {
+        size: "L",
+        price: 57.99,
+        discount: 7,
+        stock: { Blue: 7, Black: 9, Green: 4 },
+      },
+      { size: "XL", price: 57.99, stock: { Blue: 2, Black: 5, Green: 1 } },
+    ],
     isNew: true,
     isFeatured: false,
     isArchived: false,
     createdAt: "2024-06-10T14:20:00Z",
+  },
+  {
+    id: "4",
+    slug: "relaxed-everyday-tee",
+    name: "Relaxed Everyday Tee",
+    description: "A soft, drapey tee in warm seasonal colours.",
+    category: "t-shirts",
+    colors: [
+      { name: "Peach", code: "#f4a58a", image: "/assets/products/4p.png" },
+      { name: "Cream", code: "#e8e1d0", image: "/assets/products/4w.png" },
+    ],
     sizes: [
-      {
-        size: "S",
-        price: 29.99,
-        variants: [
-          { color: "Navy", colorCode: "#1e3a8a", image: "/assets/products/polo-navy.png", stock: 12 },
-        ]
-      },
-      {
-        size: "M",
-        price: 29.99,
-        variants: [
-          { color: "Navy", colorCode: "#1e3a8a", image: "/assets/products/polo-navy.png", stock: 18 },
-          { color: "White", colorCode: "#ffffff", image: "/assets/products/polo-white.png", stock: 15 },
-        ]
-      },
+      { size: "S", price: 17.99, stock: { Peach: 14, Cream: 11 } },
+      { size: "M", price: 17.99, stock: { Peach: 20, Cream: 16 } },
+      { size: "L", price: 19.99, stock: { Peach: 9, Cream: 0 } },
+      { size: "XL", price: 19.99, stock: { Peach: 4, Cream: 3 } },
+    ],
+    isNew: false,
+    isFeatured: false,
+    isArchived: false,
+    createdAt: "2024-04-20T08:00:00Z",
+  },
+  {
+    id: "5",
+    slug: "classic-fleece-hoodie",
+    name: "Classic Fleece Hoodie",
+    description: "Our everyday pullover hoodie in midweight fleece.",
+    category: "hoodies",
+    colors: [
+      { name: "Black", code: "#2b2f33", image: "/assets/products/5bl.png" },
+      { name: "Orange", code: "#f07a1a", image: "/assets/products/5o.png" },
+      { name: "Red", code: "#e02424", image: "/assets/products/5r.png" },
+    ],
+    sizes: [
+      { size: "S", price: 39.99, stock: { Black: 12, Orange: 6, Red: 5 } },
+      { size: "M", price: 39.99, stock: { Black: 18, Orange: 10, Red: 9 } },
       {
         size: "L",
-        price: 31.99,
-        discount: 5, // Special discount on Large
-        variants: [
-          { color: "Navy", colorCode: "#1e3a8a", image: "/assets/products/polo-navy.png", stock: 10 },
-          { color: "White", colorCode: "#ffffff", image: "/assets/products/polo-white.png", stock: 8 },
-        ]
+        price: 42.99,
+        discount: 4,
+        stock: { Black: 14, Orange: 0, Red: 7 },
       },
+      { size: "XL", price: 42.99, stock: { Black: 8, Orange: 3, Red: 2 } },
     ],
+    isNew: false,
+    isFeatured: true,
+    isArchived: false,
+    createdAt: "2024-03-05T12:00:00Z",
+  },
+  {
+    id: "6",
+    slug: "court-low-sneakers",
+    name: "Court Low Sneakers",
+    description: "Low-top leather-look sneakers with a cushioned sole.",
+    category: "shoes",
+    colors: [
+      { name: "Gray", code: "#9aa3ad", image: "/assets/products/6g.png" },
+      { name: "White", code: "#f3f4f1", image: "/assets/products/6w.png" },
+    ],
+    sizes: [
+      { size: "40", price: 79.99, stock: { Gray: 4, White: 3 } },
+      { size: "41", price: 79.99, stock: { Gray: 6, White: 5 } },
+      { size: "42", price: 79.99, stock: { Gray: 8, White: 0 } },
+      { size: "43", price: 79.99, discount: 10, stock: { Gray: 5, White: 4 } },
+      { size: "44", price: 79.99, stock: { Gray: 2, White: 1 } },
+    ],
+    isNew: true,
+    isFeatured: true,
+    isArchived: false,
+    createdAt: "2024-06-18T09:00:00Z",
+  },
+  {
+    id: "7",
+    slug: "mesh-runner-sneakers",
+    name: "Mesh Runner Sneakers",
+    description: "Lightweight, breathable mesh runners for everyday miles.",
+    category: "shoes",
+    colors: [
+      { name: "Gray", code: "#b4b6b8", image: "/assets/products/7g.png" },
+      { name: "Pink", code: "#e9a0a0", image: "/assets/products/7p.png" },
+    ],
+    sizes: [
+      { size: "40", price: 64.99, stock: { Gray: 7, Pink: 5 } },
+      { size: "41", price: 64.99, stock: { Gray: 9, Pink: 6 } },
+      { size: "42", price: 64.99, stock: { Gray: 11, Pink: 4 } },
+      { size: "43", price: 64.99, stock: { Gray: 6, Pink: 0 } },
+    ],
+    isNew: false,
+    isFeatured: false,
+    isArchived: false,
+    createdAt: "2024-02-12T11:00:00Z",
+  },
+  {
+    id: "8",
+    slug: "chambray-button-up-shirt",
+    name: "Chambray Button-Up Shirt",
+    description: "A lightweight long-sleeve shirt in washed chambray.",
+    category: "shirts",
+    colors: [
+      { name: "Blue", code: "#5b83b3", image: "/assets/products/8b.png" },
+      { name: "Green", code: "#5f8a82", image: "/assets/products/8gr.png" },
+    ],
+    sizes: [
+      { size: "S", price: 34.99, stock: { Blue: 6, Green: 4 } },
+      { size: "M", price: 34.99, stock: { Blue: 10, Green: 8 } },
+      { size: "L", price: 36.99, stock: { Blue: 7, Green: 5 } },
+      { size: "XL", price: 36.99, discount: 4, stock: { Blue: 3, Green: 0 } },
+    ],
+    isNew: true,
+    isFeatured: false,
+    isArchived: false,
+    createdAt: "2024-06-25T15:30:00Z",
   },
 ];
 
-export const brands: string[] = Array.from(
-  new Set(products.map((product) => product.brand)),
+// Archived products never reach the UI.
+export const products: ProductsType = rawProducts.filter(
+  (product) => !product.isArchived,
 );

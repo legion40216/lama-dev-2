@@ -1,13 +1,17 @@
 import type { CategorySlug, SizeFilter } from "@/schema";
 import type { ProductType } from "@/types/types";
-import { getLowestPrice } from "@/utils/product-variants";
+import {
+  getFinalPrice,
+  getLowestPrice,
+  isProductInStock,
+  isSizeInStock,
+} from "@/utils/product-variants";
 
 export interface ProductFilters {
   categoryParam: CategorySlug;
   sizeParam: SizeFilter;
   minPrice: number;
   maxPrice: number;
-  brandParam: string[];
   featuredParam: boolean;
   inStockParam: boolean;
   queryParam?: string;
@@ -20,53 +24,43 @@ export function filterProducts(
     sizeParam,
     minPrice,
     maxPrice,
-    brandParam,
     featuredParam,
     inStockParam,
     queryParam = "",
   }: ProductFilters,
 ): ProductType[] {
-  return products.filter((product) => {
-    if (categoryParam && product.category !== categoryParam) return false;
+  const query = queryParam.toLowerCase().trim();
 
-    const query = queryParam.toLowerCase().trim();
+  return products.filter((product) => {
+    if (categoryParam !== "all" && product.category !== categoryParam) {
+      return false;
+    }
+
     if (
       query &&
-      ![product.name, product.brand, product.description].some((value) =>
+      ![product.name, product.description, product.category].some((value) =>
         value.toLowerCase().includes(query),
       )
     ) {
       return false;
     }
 
-    const variants = sizeParam
-      ? product.variants.filter((variant) => variant.size === sizeParam)
-      : product.variants;
+    if (featuredParam && !product.isFeatured) return false;
 
-    if (variants.length === 0) return false;
+    // With a size filter, price and stock are judged for that size only.
+    if (sizeParam) {
+      const option = product.sizes.find((o) => o.size === sizeParam);
+      if (!option) return false;
 
-    const priceToFilter = sizeParam
-      ? variants[0].price
-      : getLowestPrice({ variants });
+      const price = getFinalPrice(option);
+      if (price < minPrice || price > maxPrice) return false;
 
-    if (priceToFilter < minPrice || priceToFilter > maxPrice) return false;
-
-    if (brandParam.length > 0 && !brandParam.includes(product.brand)) {
-      return false;
+      return !inStockParam || isSizeInStock(option);
     }
 
-    if (
-      featuredParam &&
-      !product.isFeatured &&
-      !product.isBestSeller
-    ) {
-      return false;
-    }
+    const price = getLowestPrice(product);
+    if (price < minPrice || price > maxPrice) return false;
 
-    if (inStockParam && !variants.some((variant) => variant.stock > 0)) {
-      return false;
-    }
-
-    return true;
+    return !inStockParam || isProductInStock(product);
   });
 }

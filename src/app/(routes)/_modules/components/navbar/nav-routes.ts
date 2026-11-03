@@ -11,6 +11,6 @@ export function useNavRoutes() {
     ...link,
     active:
       pathname === link.href ||
-      (link.href !== "/" && pathname.startsWith(link.href + "/")),
+      (link.href !== "/" && pathname.startsWith(`${link.href}/`)),
   }));
 }

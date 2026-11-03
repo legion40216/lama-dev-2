@@ -5,10 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-import { getProductPath } from "@/utils/product-url";
 import useCart from "@/hooks/useCartStore";
 import type { CartItemType } from "@/types/cart";
 import { formatter } from "@/utils/formatters";
+import { getProductPath } from "@/utils/product-url";
 
 interface CartItemProps {
   item: CartItemType;
@@ -16,7 +16,8 @@ interface CartItemProps {
 }
 
 export default function CartItem({ item, onNavigate }: CartItemProps) {
-  const { removeItem, updateItemCount } = useCart();
+  const removeItem = useCart((state) => state.removeItem);
+  const updateItemCount = useCart((state) => state.updateItemCount);
 
   return (
     <div className="grid grid-cols-[72px_1fr] gap-3 border-b py-4">
@@ -34,14 +35,17 @@ export default function CartItem({ item, onNavigate }: CartItemProps) {
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <Link
-              href={getProductPath(item.slug, item.size)}
+              href={getProductPath(item.slug, {
+                size: item.size,
+                color: item.color,
+              })}
               onClick={onNavigate}
               className="block truncate font-medium hover:underline"
             >
               {item.name}
             </Link>
             <p className="text-xs text-muted-foreground">
-              {item.brand} · {item.size}
+              {item.color} · {item.size}
             </p>
           </div>
 

@@ -90,8 +90,8 @@ const useCart = create<CartState>()(
       name: "cart-storage",
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ items: state.items }),
-      // Carts saved before sizes existed use the old shape, so start fresh
-      version: 2,
+      // Bump when CartItemType changes; carts saved in an older shape are dropped
+      version: 3,
       migrate: () => ({ items: [] }),
     },
   ),

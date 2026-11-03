@@ -1,7 +1,7 @@
+import { type ProductSize, SIZES } from "@/data/sizes";
 import { getHighestPrice, getLowestPrice } from "@/utils/product-variants";
-import { products } from "./data";
 import type { ProductCategorySlug } from "./categories";
-import type { ProductSize } from "@/types/types";
+import { products } from "./data";
 
 export const sortOptions = [
   { label: "Newest", value: "newest" },
@@ -14,51 +14,45 @@ export type SortValue = (typeof sortOptions)[number]["value"];
 
 export const CURRENCY = "USD";
 
-export const PRICE_STEP = 500;
+// Price slider step (whole currency units)
+export const PRICE_STEP = 5;
 
+// Lowest / highest price (rounded to PRICE_STEP) for the products that match
+// a category and/or size. Used as the price slider's range.
 export function getPriceBounds({
   category,
   size,
 }: {
-  category?: ProductCategorySlug;
+  category?: ProductCategorySlug | "all";
   size?: ProductSize;
 }): { min: number; max: number } {
-  const matchingProducts = products.filter((product) => {
-    if (category && product.category !== category) return false;
-    if (size && !product.variants.some((variant) => variant.size === size)) {
+  const matching = products.filter((product) => {
+    if (category && category !== "all" && product.category !== category) {
+      return false;
+    }
+    if (size && !product.sizes.some((option) => option.size === size)) {
       return false;
     }
     return true;
   });
 
-  const { lowestPrice, highestPrice } = matchingProducts.reduce(
-    (bounds, product) => {
-      const variants = size
-        ? product.variants.filter((variant) => variant.size === size)
-        : product.variants;
+  if (matching.length === 0) return { min: 0, max: PRICE_STEP };
 
-      return {
-        lowestPrice: Math.min(
-          bounds.lowestPrice,
-          getLowestPrice({ variants }),
-        ),
-        highestPrice: Math.max(
-          bounds.highestPrice,
-          getHighestPrice({ variants }),
-        ),
-      };
-    },
-    { lowestPrice: Number.POSITIVE_INFINITY, highestPrice: 0 },
-  );
-
-  const min = Number.isFinite(lowestPrice)
-    ? Math.floor(lowestPrice / PRICE_STEP) * PRICE_STEP
-    : 0;
+  const lowest = Math.min(...matching.map((p) => getLowestPrice(p, size)));
+  const highest = Math.max(...matching.map((p) => getHighestPrice(p, size)));
 
   return {
-    min,
-    max: Math.max(PRICE_STEP, Math.ceil(highestPrice / PRICE_STEP) * PRICE_STEP),
+    min: Math.floor(lowest / PRICE_STEP) * PRICE_STEP,
+    max: Math.max(PRICE_STEP, Math.ceil(highest / PRICE_STEP) * PRICE_STEP),
   };
 }
 
-export const PRICE_BOUNDS: { min: number; max: number } = getPriceBounds({});
+export const PRICE_BOUNDS = getPriceBounds({});
+
+// Sizes that at least one product comes in, in canonical order.
+// Drives the size filter, so unused sizes never show up.
+export const availableSizes = SIZES.filter((size) =>
+  products.some((product) =>
+    product.sizes.some((option) => option.size === size),
+  ),
+);

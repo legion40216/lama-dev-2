@@ -8,37 +8,18 @@ export function sortProducts(
   sizeParam?: SizeFilter,
 ): ProductType[] {
   const sorted = [...products];
-
-  const getComparisonPrice = (product: ProductType) => {
-    if (sizeParam) {
-      return (
-        product.variants.find((variant) => variant.size === sizeParam)?.price ??
-        Number.POSITIVE_INFINITY
-      );
-    }
-
-    return getLowestPrice(product);
-  };
+  const time = (product: ProductType) => new Date(product.createdAt).getTime();
+  const price = (product: ProductType) => getLowestPrice(product, sizeParam);
 
   switch (filter) {
     case "newest":
-      return sorted.sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      );
-
+      return sorted.sort((a, b) => time(b) - time(a));
     case "oldest":
-      return sorted.sort(
-        (a, b) =>
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-      );
-
+      return sorted.sort((a, b) => time(a) - time(b));
     case "price_low_high":
-      return sorted.sort((a, b) => getComparisonPrice(a) - getComparisonPrice(b));
-
+      return sorted.sort((a, b) => price(a) - price(b));
     case "price_high_low":
-      return sorted.sort((a, b) => getComparisonPrice(b) - getComparisonPrice(a));
-
+      return sorted.sort((a, b) => price(b) - price(a));
     default:
       return sorted;
   }

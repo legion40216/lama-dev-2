@@ -19,11 +19,7 @@ import useHydrated from "@/hooks/useHydrated";
 import { formatter } from "@/utils/formatters";
 import CartItem from "./cart/cart-item";
 
-interface CartProps {
-  mobile?: boolean;
-}
-
-export default function Cart({ mobile = false }: CartProps) {
+export default function Cart() {
   const [isOpen, setIsOpen] = useState(false);
   const [isBumping, setIsBumping] = useState(false);
   const previousCount = useRef<number | null>(null);
@@ -58,11 +54,7 @@ export default function Cart({ mobile = false }: CartProps) {
           <Button
             variant="ghost"
             size="icon"
-            className={
-              mobile
-                ? "relative h-14 w-full min-w-0 flex-1 flex-col gap-1 rounded-lg text-[11px] font-medium text-muted-foreground hover:text-foreground"
-                : "relative"
-            }
+            className="relative"
             aria-label={`Open cart, ${totalCount} items`}
           />
         }
@@ -71,14 +63,8 @@ export default function Cart({ mobile = false }: CartProps) {
           className={`size-5 ${isBumping ? "animate-bounce" : ""}`}
         />
 
-        {mobile && <span>Cart</span>}
-
         {totalCount > 0 && (
-          <span className={
-              mobile
-                ? "absolute right-1/2 top-1 flex size-4 translate-x-3 items-center justify-center rounded-full bg-red-500 text-[10px] font-medium text-white"
-                : "absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-medium text-white"
-            }>
+          <span className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-medium text-white">
             {totalCount > 9 ? "9+" : totalCount}
           </span>
         )}

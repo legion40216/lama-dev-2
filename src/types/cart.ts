@@ -1,16 +1,17 @@
 import type { ProductSize } from "@/types/types";
 
-// One line in the cart = one product in one size
+// One line in the cart = one product in one size and one colour
 export type CartProduct = {
-  id: string; // line id: product id + size (see getCartLineId)
+  id: string; // line id: product + size + colour (see getCartLineId)
   productId: string;
   slug: string;
   name: string;
-  brand: string;
-  image: string;
+  image: string; // photo of the chosen colour
   size: ProductSize;
-  price: number; // price of this size
-  stock: number; // stock of this size
+  color: string;
+  colorCode: string;
+  price: number; // final unit price (discount already applied)
+  stock: number; // stock of this size + colour
 };
 
 export type CartItemType = CartProduct & {
