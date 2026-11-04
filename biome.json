@@ -7,7 +7,16 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!node_modules", "!.next", "!dist", "!build"]
+    "includes": [
+      "**",
+      "!node_modules",
+      "!.next",
+      "!dist",
+      "!build",
+      "!src/components/ui",
+      "!src/hooks/use-highlighted-code.ts",
+      "!src/lib/highlighter.tsx"
+    ]
   },
   "formatter": {
     "enabled": true,

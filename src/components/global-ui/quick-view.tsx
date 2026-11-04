@@ -3,13 +3,10 @@
 import { Eye } from "lucide-react";
 import { useState } from "react";
 
-import type { ProductSize } from "@/types/types";
-
-import QuickViewContent, {
-  type QuickViewProduct,
-} from "@/components/global-ui/quick-view-content";
+import QuickViewContent from "@/components/global-ui/quick-view-content";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import type { ProductSize, ProductType } from "@/types/types";
 
 // Eye icon for product cards. Opens the quick view modal.
 export default function QuickView({
@@ -18,7 +15,7 @@ export default function QuickView({
   open: controlledOpen,
   onOpenChange,
 }: {
-  product: QuickViewProduct;
+  product: ProductType;
   selectedSize?: ProductSize;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
