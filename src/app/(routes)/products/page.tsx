@@ -1,27 +1,39 @@
-import type { Metadata } from "next";
+import { getValidatedSearchParams } from "@/utils/parseSearchParams";
+import { redirect } from "next/navigation";
 
-import ProductSection from "@/features/product-listing/product-section";
-import type { RawSearchParams } from "@/utils/parseSearchParams";
-import { resolveListingParams } from "@/utils/resolve-listing-params";
+import ProductView from "./_modules/views/product-view";
 
-export const metadata: Metadata = { title: "Products" };
-
-export default async function ProductsPage(props: {
-  searchParams: Promise<RawSearchParams>;
+export default async function Page(props: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const params = await resolveListingParams(props.searchParams, "/products");
+  const rawSearchParams = await props.searchParams;
+  const validatedParams = getValidatedSearchParams(rawSearchParams);
+
+  // Check if we need to redirect due to invalid params
+  const rawCategory = typeof rawSearchParams.category === "string" 
+    ? rawSearchParams.category 
+    : undefined;
+  const rawFilter = typeof rawSearchParams.filter === "string"
+    ? rawSearchParams.filter
+    : undefined;
+
+  const needsRedirect = 
+    (rawCategory && rawCategory !== validatedParams.category) ||
+    (rawFilter && rawFilter !== validatedParams.filter);
+
+  if (needsRedirect) {
+    const newParams = new URLSearchParams();
+    newParams.set("category", validatedParams.category);
+    newParams.set("filter", validatedParams.filter);
+    redirect(`/?${newParams.toString()}`);
+  }
 
   return (
-    <ProductSection
-      categoryParam={params.category}
-      filterParam={params.filter}
-      sizeParam={params.size}
-      minPrice={params.minPrice}
-      maxPrice={params.maxPrice}
-      featuredParam={params.featured}
-      inStockParam={params.inStock}
-      queryParam={params.q}
-      headingTitle="All products"
-    />
+    <div>
+      <ProductView
+        categoryParam={validatedParams.category}
+        filterParam={validatedParams.filter}
+      />
+    </div>
   );
 }
