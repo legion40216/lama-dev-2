@@ -1,4 +1,3 @@
-import SearchDialog from "@/components/search/search-dialog";
 import Cart from "./nav-right/cart";
 import UserMenu from "./nav-right/user-menu";
 

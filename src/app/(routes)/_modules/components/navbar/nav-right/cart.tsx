@@ -1,6 +1,7 @@
 "use client";
 
 import { ShoppingBasket, Trash2, X } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
@@ -17,7 +18,7 @@ import {
 import useCart from "@/hooks/useCartStore";
 import useHydrated from "@/hooks/useHydrated";
 import { formatter } from "@/utils/formatters";
-import CartItem from "./cart/cart-item";
+import { getProductPath } from "@/utils/product-url";
 
 export default function Cart() {
   const [isOpen, setIsOpen] = useState(false);
@@ -114,15 +115,43 @@ export default function Cart() {
             </SheetClose>
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto px-4">
+          // Read-only summary; quantity and removal live on /checkout.
+          <ul className="flex-1 divide-y overflow-y-auto px-4">
             {visibleItems.map((item) => (
-              <CartItem
-                key={item.id}
-                item={item}
-                onNavigate={() => setIsOpen(false)}
-              />
+              <li key={item.id} className="flex gap-3 py-3">
+                <Link
+                  href={getProductPath(item.slug, {
+                    size: item.size,
+                    color: item.color,
+                  })}
+                  onClick={() => setIsOpen(false)}
+                  className="relative block aspect-[4/5] w-16 shrink-0 overflow-hidden bg-muted"
+                >
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    fill
+                    sizes="64px"
+                    className="object-cover"
+                  />
+                </Link>
+
+                <div className="min-w-0 flex-1 space-y-0.5 text-sm">
+                  <p className="truncate font-medium">{item.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {item.size} · {item.color}
+                  </p>
+                  <p className="text-xs tabular-nums text-muted-foreground">
+                    {item.count} × {formatter.format(item.price)}
+                  </p>
+                </div>
+
+                <span className="text-sm tabular-nums">
+                  {formatter.format(item.price * item.count)}
+                </span>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
 
         <div className="space-y-4 border-t p-4">
