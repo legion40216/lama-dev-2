@@ -1,47 +1,27 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
-import { Minus, Plus, Trash2, X } from "lucide-react";
-import { toast } from "@/components/ui/toast";
-import { formatter } from "@/utils/formatters";
-import useCart from "@/hooks/useCartStore";
 import Link from "next/link";
+import { Minus, Plus, Trash2, X } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/toast";
+import useCart from "@/hooks/useCartStore";
+import type { CartItemType } from "@/types/cart";
+import { formatter } from "@/utils/formatters";
 
 type CheckoutItemProps = {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  discount: number;
-  image: string;
-  count: number;
-  selectedSize: string;
-  selectedColor: string;
+  item: CartItemType;
 };
 
-export default function CheckoutItem({
-  id,
-  title,
-  description,
-  price,
-  discount,
-  image,
-  selectedSize,
-  selectedColor,
-  count,
-}: CheckoutItemProps) {
+export default function CheckoutItem({ item }: CheckoutItemProps) {
   const { removeItem, updateItemCount } = useCart();
-  const [cartQuantity, setCartQuantity] = useState<number>(count);
-
-  const finalPrice = price - discount;
-  const hasDiscount = discount > 0;
+  const [cartQuantity, setCartQuantity] = useState(item.count);
 
   const handleRemove = () => {
-    removeItem(id, selectedSize, selectedColor);
+    removeItem(item.id);
   };
 
   const handleQuantityChange = (newQuantity: number) => {
@@ -50,77 +30,60 @@ export default function CheckoutItem({
       return;
     }
 
+    if (newQuantity > item.stock) {
+      toast.add({ title: `Only ${item.stock} in stock.`, type: "error" });
+      return;
+    }
+
     setCartQuantity(newQuantity);
-    updateItemCount(id, selectedSize, selectedColor, newQuantity);
+    updateItemCount(item.id, newQuantity);
   };
 
   return (
-    <li className="flex gap-2 group">
-      {/* PRODUCT IMAGE */}
+    <li className="group flex gap-2">
       <Link
-        href={`/product/${id}`}
-        className="block relative overflow-hidden rounded-md border border-gray-200 aspect-square w-[28%]"
+        href={`/product/${item.slug}`}
+        className="relative block aspect-square w-[28%] overflow-hidden rounded-md border border-gray-200"
       >
-        <Image src={image} alt={title} fill className="object-cover" />
+        <Image src={item.image} alt={item.name} fill className="object-cover" />
       </Link>
 
-      {/* PRODUCT DETAILS */}
-      <div className="flex flex-col justify-between w-full">
+      <div className="flex w-full flex-col justify-between">
         <div className="flex items-start justify-between gap-4">
           <Link
-            href={`/product/${id}`}
+            href={`/product/${item.slug}`}
             className="block underline group-hover:text-pizza-store-primary"
           >
-            <h3 className="font-bold">{title}</h3>
+            <h3 className="font-bold">{item.name}</h3>
           </Link>
 
           <div className="flex flex-col items-end space-y-1">
             <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-              {formatter.format(finalPrice)}
+              {formatter.format(item.price)}
               <X className="h-2 w-2" />
-              <span>{count}</span>
+              <span>{cartQuantity}</span>
             </div>
-
             <Badge className="font-semibold" variant="secondary">
-              {formatter.format(finalPrice * count)}
+              {formatter.format(item.price * cartQuantity)}
             </Badge>
-
-            {hasDiscount && (
-              <span className="text-xs text-green-600 font-medium">
-                Saved {formatter.format(discount * count)}
-              </span>
-            )}
           </div>
         </div>
 
         <div className="flex items-center justify-between gap-4">
           <div className="space-y-2">
-            {/* Show size and color if not "One Size" */}
-            {selectedSize !== "One Size" && (
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span>Size: {selectedSize}</span>
-                <span>•</span>
-                <span className="flex items-center gap-2">
-                  Color:{" "}
-                  <div
-                    className="size-3 rounded-full border-2 border-gray-300"
-                    style={{ backgroundColor: selectedColor }}
-                  />
-                </span>
-              </div>
-            )}
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span>Size: {item.size}</span>
+              <span>•</span>
+              <span className="flex items-center gap-2">
+                Color: {item.color}
+                <span
+                  className="size-3 rounded-full border-2 border-gray-300"
+                  style={{ backgroundColor: item.colorCode }}
+                />
+              </span>
+            </div>
 
-            {selectedSize === "One Size" && (
-              <p className="text-xs text-muted-foreground">
-                Color: {selectedColor}
-              </p>
-            )}
-
-            <p className="text-xs text-muted-foreground line-clamp-2">
-              {description}
-            </p>
-
-            <div className="flex items-center border rounded-md w-max">
+            <div className="flex w-max items-center rounded-md border">
               <Button
                 variant="ghost"
                 size="icon"
@@ -134,6 +97,7 @@ export default function CheckoutItem({
                 variant="ghost"
                 size="icon"
                 onClick={() => handleQuantityChange(cartQuantity + 1)}
+                disabled={cartQuantity >= item.stock}
               >
                 <Plus className="size-4" />
               </Button>
@@ -145,7 +109,7 @@ export default function CheckoutItem({
             variant="ghost"
             onClick={handleRemove}
           >
-            <Trash2 className="size-4 mr-2" />
+            <Trash2 className="mr-2 size-4" />
             Remove
           </Button>
         </div>
