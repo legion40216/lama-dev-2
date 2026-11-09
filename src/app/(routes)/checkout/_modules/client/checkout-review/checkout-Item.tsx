@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { Minus, Plus, Trash2, X } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/toast";
 import { formatter } from "@/utils/formatters";
 import useCart from "@/hooks/useCartStore";
 import Link from "next/link";
@@ -46,7 +46,7 @@ export default function CheckoutItem({
 
   const handleQuantityChange = (newQuantity: number) => {
     if (newQuantity < 1) {
-      toast.error("Quantity cannot be less than 1.");
+      toast.add({ title: "Quantity cannot be less than 1.", type: "error" });
       return;
     }
 
