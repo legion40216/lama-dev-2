@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 
-import { categories } from '@/data/data';
+import { categories } from '@/data/categories';
 import { useSearchParams, useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
