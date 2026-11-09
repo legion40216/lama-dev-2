@@ -1,9 +1,9 @@
 "use client";
 
-import { 
-  usePathname, 
-  useRouter, 
-  useSearchParams 
+import {
+  usePathname,
+  useRouter,
+  useSearchParams,
 } from "next/navigation";
 
 import {
@@ -23,7 +23,9 @@ export default function ProductListFilter({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const handleFilterChange = (value: string) => {
+  const handleFilterChange = (value: string | null) => {
+    if (!value) return;
+
     const params = new URLSearchParams(searchParams.toString());
     params.set("filter", value);
     router.push(`${pathname}?${params.toString()}`);
@@ -31,10 +33,7 @@ export default function ProductListFilter({
 
   return (
     <div>
-      <Select
-        value={currentFilter} // ✅ Changed from defaultValue to value
-        onValueChange={handleFilterChange}
-      >
+      <Select value={currentFilter} onValueChange={handleFilterChange}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Sort" />
         </SelectTrigger>
