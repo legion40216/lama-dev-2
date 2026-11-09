@@ -2,7 +2,7 @@
 "use client";
 import React from 'react'
 
-import { ProductType } from '@/types';
+import type { ProductType } from '@/types/types';
 import { CategorySlug, FilterValue } from '@/schema';
 import { products } from '@/data/data';
 
